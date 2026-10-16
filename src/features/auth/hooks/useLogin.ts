@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
-import { useAuthStore } from "./authStore"
-import type { AuthResult } from "./types"
 import { api } from "@/lib/api"
+import { useAuthStore } from "../authStore"
+import type { AuthResult } from "../types"
 
 export interface LoginInput{
     email:string,

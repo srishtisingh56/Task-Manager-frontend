@@ -1,7 +1,7 @@
 import type { TaskPriority } from '@/types/api'
 import { formatDateTime } from '@/lib/dates'
 import { TaskStatusBadge } from './TaskStatusBadge'
-import type { Task } from './types'
+import type { Task } from '../types'
 
 
 const priorityStyles: Record<TaskPriority, string> = {

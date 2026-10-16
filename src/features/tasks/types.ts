@@ -21,3 +21,29 @@ export const STATUSES: TaskStatus[] = ['Pending', 'Halted', 'Overdue', 'Complete
 
 export type TaskRelation = 'AssignedToMe' | 'AssignedByMe' | 'Personal'
 
+export interface CreateTaskBody{
+  title: string
+  description: string | null
+  priority: TaskPriority | null
+  lenientDeadline: string
+  strictDeadline: string
+  isRepetitive: boolean
+  assignedToUserId: string
+}
+
+export interface UpdateDetailsBody {
+  title?: string
+  description?: string | null
+  priority?: TaskPriority | null
+}
+
+export interface UpdateDeadlinesBody {
+  lenientDeadline?: string
+  strictDeadline?: string
+}
+
+export interface TaskUpdates {
+  details?: UpdateDetailsBody
+  deadlines?: UpdateDeadlinesBody
+  repetitive?: boolean
+}

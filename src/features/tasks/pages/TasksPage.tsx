@@ -1,12 +1,12 @@
 import { useSearchParams } from "react-router-dom"
-import { useAuthStore } from "../auth/authStore";
-import { RELATION_OPTIONS, STATUS_OPTIONS } from "./filterOptions";
+import { useAuthStore } from "../../auth/authStore";
+import { RELATION_OPTIONS, STATUS_OPTIONS } from "../filterOptions";
 import type { TaskStatus } from "@/types/api";
-import { useTasks } from "./useTasks";
+import { useTasks } from "../hooks/useTasks";
 import { Pagination } from "@/components/Pagination";
-import { TaskCard } from "./TaskCard";
+import { TaskCard } from "../components/TaskCard";
 import { getErrorMessage } from "@/lib/apiError";
-import type { TaskRelation } from "./types";
+import type { TaskRelation } from "../types";
 import { FilterTabs } from "@/components/FilterTabs";
 
 const PAGE_SIZE = 10

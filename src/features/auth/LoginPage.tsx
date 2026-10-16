@@ -2,9 +2,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { useLogin } from './useLogin'
 import { isSessionValid, useAuthStore } from './authStore'
 import { getErrorMessage } from '@/lib/apiError'
+import { useLogin } from './hooks/useLogin'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Enter a valid email'),
