@@ -11,7 +11,13 @@ export interface Task {
   isRepetitive: boolean
   createdByUserId: string
   assignedToUserId: string
+  //add creater and assignee names
+  createdByName: string | null
+  assignedToName: string | null
   warning: string | null
 }
 
 export const STATUSES: TaskStatus[] = ['Pending', 'Halted', 'Overdue', 'Completed']
+
+export type TaskRelation = 'AssignedToMe' | 'AssignedByMe' | 'Personal'
+

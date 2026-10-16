@@ -3,6 +3,7 @@ import { formatDateTime } from '@/lib/dates'
 import { TaskStatusBadge } from './TaskStatusBadge'
 import type { Task } from './types'
 
+
 const priorityStyles: Record<TaskPriority, string> = {
   Low: 'text-slate-400',
   Medium: 'text-sky-300',
@@ -19,6 +20,11 @@ function relationLabel(task: Task, me: string): string {
   return 'Other user' // only visible to system admins
 }
 
+function personLabel(id: string, name: string | null, me: string): string {
+  if (id === me) return 'You'
+  return name ?? 'Unknown user'
+}
+
 type Props = { task: Task; currentUserId: string }
 
 export function TaskCard({ task, currentUserId }: Props) {
@@ -32,6 +38,12 @@ export function TaskCard({ task, currentUserId }: Props) {
       {task.description && (
         <p className="mt-1.5 line-clamp-2 text-sm text-slate-400">{task.description}</p>
       )}
+
+      <p className="mt-3 text-sm text-slate-400">
+        <span title={task.createdByUserId}>{personLabel(task.createdByUserId, task.createdByName, currentUserId)}</span>
+        <span className="mx-2 text-slate-600">→</span>
+        <span title={task.assignedToUserId}>{personLabel(task.assignedToUserId, task.assignedToName, currentUserId)}</span>
+      </p>
 
       <dl className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
         <div>

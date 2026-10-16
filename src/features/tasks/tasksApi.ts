@@ -1,11 +1,12 @@
-import type { PagedResult } from "@/types/api";
-import type { Task } from "./types";
+import type { PagedResult, TaskStatus } from "@/types/api";
+import type { Task, TaskRelation } from "./types";
 import { api } from "@/lib/api";
 
 export interface TaskFilters {
-    status?: string;
-    pageNumber: number,
-    pageSize: number;
+    status?: TaskStatus;
+    relation?: TaskRelation
+    pageNumber: number
+    pageSize: number
 }
 
 export async function fetchTasks(filters: TaskFilters) : Promise<PagedResult<Task>> {

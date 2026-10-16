@@ -1,38 +1,48 @@
 import { useSearchParams } from "react-router-dom"
 import { useAuthStore } from "../auth/authStore";
-import { STATUSES } from "./types";
+import { RELATION_OPTIONS, STATUS_OPTIONS } from "./filterOptions";
 import type { TaskStatus } from "@/types/api";
 import { useTasks } from "./useTasks";
 import { Pagination } from "@/components/Pagination";
 import { TaskCard } from "./TaskCard";
 import { getErrorMessage } from "@/lib/apiError";
-import { StatusFilter } from "./StatusFilter";
+import type { TaskRelation } from "./types";
+import { FilterTabs } from "@/components/FilterTabs";
 
 const PAGE_SIZE = 10
 
 export function TasksPage(){
     const [searchParams,setSearchParams] = useSearchParams();
     const currentUserId = useAuthStore(state => state.user!.id)
-    const status: TaskStatus | undefined = STATUSES.find(s => s === searchParams.get("status"))
+    const status = STATUS_OPTIONS.find((opt)=>opt.value === searchParams.get("status"))?.value
+    const relation = RELATION_OPTIONS.find((opt)=>opt.value === searchParams.get("relation"))?.value
     const pageNumber = Math.max(1,Number(searchParams.get("page")) || 1)
 
     const {data,isPending,isError,error,refetch,isFetching,isPlaceholderData} = useTasks({
         status,
+        relation,
         pageNumber,
         pageSize: PAGE_SIZE
     })
+    
+    function updateParams(changes:Record<string,string | undefined>){
+      setSearchParams((prev)=>{
+        const params = new URLSearchParams(prev)
+        for(const [key,val] of Object.entries(changes)){
+          if(val === undefined){
+            params.delete(key)
+          }else{
+            params.set(key,val)
+          }
 
-    function changeStatus(next:TaskStatus|undefined){
-        setSearchParams(next?{status:next}:{})
+        }
+        return params
+      })
     }
-
-    function changePage(next:number){
-        setSearchParams(prev => {
-            const params = new URLSearchParams(prev)
-            params.set("page",String(next))
-            return params
-        })
-    }
+    
+    const changeStatus = (s:TaskStatus | undefined) => updateParams({status:s, page:undefined})
+    const changeRelation = (r:TaskRelation | undefined) => updateParams({relation:r, page:undefined})
+    const changePage = (p: number) => updateParams({page: String(p)})
 
     const totalPages = data ? Math.max(1,Math.ceil(data.totalCount / PAGE_SIZE)) : 1
 
@@ -50,7 +60,19 @@ export function TasksPage(){
         {isFetching && !isPending && <span className="text-xs text-slate-500">Updating…</span>}
       </div>
 
-      <StatusFilter value={status} onChange={changeStatus} />
+     <div className="space-y-3">
+      <FilterTabs label="Filter by relation" options={RELATION_OPTIONS} value={relation} onChange={changeRelation} />
+      <FilterTabs label="Filter by status" options={STATUS_OPTIONS} value={status} onChange={changeStatus} />
+      {(status || relation) && (
+      <button
+        type="button"
+        onClick={() => updateParams({ status: undefined, relation: undefined, page: undefined })}
+        className="text-sm text-indigo-400 hover:text-indigo-500"
+      >
+        Clear filters
+      </button>
+      )}
+    </div>
 
       {isPending ? (
         <TaskListSkeleton />
@@ -68,7 +90,9 @@ export function TasksPage(){
         <div className="rounded-xl border border-dashed border-slate-700 p-10 text-center">
           <p className="text-slate-300">No tasks here yet.</p>
           <p className="mt-1 text-sm text-slate-500">
-            {status ? `Nothing with status "${status}".` : 'Tasks you create or are assigned will appear here.'}
+            {status || relation
+              ? 'No tasks match these filters.'
+              : 'Tasks you create or are assigned will appear here.'}
           </p>
         </div>
       ) : (
