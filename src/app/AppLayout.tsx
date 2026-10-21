@@ -22,6 +22,7 @@ export function AppLayout() {
         </div>
       </header>
       <main className="mx-auto max-w-3xl px-4 py-8">
+        {/* decides which child page to render inside that area, based on the current route. */}
         <Outlet />
       </main>
     </div>

@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { useQuery } from "node_modules/@tanstack/react-query/build/modern/useQuery";
+import { useQuery } from "@tanstack/react-query";
 
 export interface Worker { id: string; name: string }
 
@@ -9,7 +9,7 @@ async function fetchMyWorkers():Promise<Worker[]> {
 }
 
 export function useWorkers() {
-    return useQuery({
+    return useQuery({   
         queryKey: ['users','my-workers'],
         queryFn: fetchMyWorkers,
         staleTime: 5*60*1000,

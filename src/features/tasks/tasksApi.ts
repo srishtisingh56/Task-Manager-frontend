@@ -1,5 +1,5 @@
 import type { PagedResult, TaskStatus } from "@/types/api";
-import type { CreateTaskBody, Task, TaskRelation, TaskUpdates, UpdateDeadlinesBody } from "./types";
+import type { CreateTaskBody, Task, TaskRelation, TaskUpdates, UpdateDeadlinesBody, UpdateDetailsBody } from "./types";
 import { api } from "@/lib/api";
 
 export interface TaskFilters {
@@ -24,7 +24,7 @@ export async function createTask(body: CreateTaskBody): Promise<Task> {
     return data;
 }
 
-export async function updateTaskDetails(taskId: string, body: UpdateDeadlinesBody): Promise<Task> {
+export async function updateTaskDetails(taskId: string, body: UpdateDetailsBody): Promise<Task> {
     const { data } = await api.patch<Task>(`/tasks/${taskId}/details`, body);
     return data;
 }

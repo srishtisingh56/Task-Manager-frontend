@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom"
+import { Link, useLocation, useSearchParams } from "react-router-dom"
 import { useAuthStore } from "../../auth/authStore";
 import { RELATION_OPTIONS, STATUS_OPTIONS } from "../filterOptions";
 import type { TaskStatus } from "@/types/api";
@@ -8,6 +8,7 @@ import { TaskCard } from "../components/TaskCard";
 import { getErrorMessage } from "@/lib/apiError";
 import type { TaskRelation } from "../types";
 import { FilterTabs } from "@/components/FilterTabs";
+import { canEditTask } from "../permissions";
 
 const PAGE_SIZE = 10
 
@@ -17,6 +18,8 @@ export function TasksPage(){
     const status = STATUS_OPTIONS.find((opt)=>opt.value === searchParams.get("status"))?.value
     const relation = RELATION_OPTIONS.find((opt)=>opt.value === searchParams.get("relation"))?.value
     const pageNumber = Math.max(1,Number(searchParams.get("page")) || 1)
+    const me = useAuthStore((s) => s.user!)
+    const notice = (useLocation().state as { notice?: string } | null)?.notice
 
     const {data,isPending,isError,error,refetch,isFetching,isPlaceholderData} = useTasks({
         status,
@@ -58,8 +61,16 @@ export function TasksPage(){
           )}
         </div>
         {isFetching && !isPending && <span className="text-xs text-slate-500">Updating…</span>}
+        <Link to="/tasks/new" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500">
+          New task
+        </Link>
       </div>
-
+      {/* ----------------------- */}
+      {notice && (
+        <div role="status" className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
+          {notice}
+        </div>
+      )}
      <div className="space-y-3">
       <FilterTabs label="Filter by relation" options={RELATION_OPTIONS} value={relation} onChange={changeRelation} />
       <FilterTabs label="Filter by status" options={STATUS_OPTIONS} value={status} onChange={changeStatus} />
@@ -99,8 +110,7 @@ export function TasksPage(){
         <>
           <div className={`space-y-3 transition-opacity ${isPlaceholderData ? 'opacity-60' : ''}`}>
             {data.items.map((task) => (
-              <TaskCard key={task.id} task={task} currentUserId={currentUserId} />
-            ))}
+          <TaskCard key={task.id} task={task} currentUserId={me.id} canEdit={canEditTask(task, me)} />            ))}
           </div>
           <Pagination
             page={pageNumber}
