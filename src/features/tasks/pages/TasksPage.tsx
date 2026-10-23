@@ -8,13 +8,13 @@ import { TaskCard } from "../components/TaskCard";
 import { getErrorMessage } from "@/lib/apiError";
 import type { TaskRelation } from "../types";
 import { FilterTabs } from "@/components/FilterTabs";
-import { canEditTask } from "../permissions";
+import { TaskActions } from "../components/TasksActions";
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 5
 
 export function TasksPage(){
     const [searchParams,setSearchParams] = useSearchParams();
-    const currentUserId = useAuthStore(state => state.user!.id)
+    // const currentUserId = useAuthStore(state => state.user!.id)
     const status = STATUS_OPTIONS.find((opt)=>opt.value === searchParams.get("status"))?.value
     const relation = RELATION_OPTIONS.find((opt)=>opt.value === searchParams.get("relation"))?.value
     const pageNumber = Math.max(1,Number(searchParams.get("page")) || 1)
@@ -110,7 +110,12 @@ export function TasksPage(){
         <>
           <div className={`space-y-3 transition-opacity ${isPlaceholderData ? 'opacity-60' : ''}`}>
             {data.items.map((task) => (
-          <TaskCard key={task.id} task={task} currentUserId={me.id} canEdit={canEditTask(task, me)} />            ))}
+          <TaskCard 
+            key={task.id} 
+            task={task} 
+            currentUserId={me.id} 
+            actions={<TaskActions task={task} me={me} />} />            
+        ))}
           </div>
           <Pagination
             page={pageNumber}

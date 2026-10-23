@@ -57,6 +57,8 @@ export function LoginPage() {
             autoComplete="email"
             {...register('email')}
             className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 outline-none focus:border-indigo-500"
+            // add default value for email input
+            defaultValue="singhsrishti019@gmail.com"
           />
           {errors.email && <p className="text-xs text-red-400">{errors.email.message}</p>}
         </div>
@@ -69,6 +71,8 @@ export function LoginPage() {
             autoComplete="current-password"
             {...register('password')}
             className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 outline-none focus:border-indigo-500"
+            // add default value for password input
+            defaultValue="Admin@123"
           />
           {errors.password && <p className="text-xs text-red-400">{errors.password.message}</p>}
         </div>

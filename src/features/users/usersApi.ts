@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 export interface Worker { id: string; name: string }
 
 async function fetchMyWorkers():Promise<Worker[]> {
-    const {data} = await api.get<Worker[]>('/workers');
+    const {data} = await api.get<Worker[]>('/users/me/workers');
     return data;
 }
 

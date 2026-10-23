@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import { useAuthStore } from '@/features/auth/authStore'
+import { Toaster } from '@/components/Toaster'
 
 export function AppLayout() {
   const user = useAuthStore((s) => s.user)
@@ -25,6 +26,7 @@ export function AppLayout() {
         {/* decides which child page to render inside that area, based on the current route. */}
         <Outlet />
       </main>
+      <Toaster />
     </div>
   )
 }

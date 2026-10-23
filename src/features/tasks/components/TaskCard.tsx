@@ -2,7 +2,7 @@ import type { TaskPriority } from '@/types/api'
 import { formatDateTime } from '@/lib/dates'
 import { TaskStatusBadge } from './TaskStatusBadge'
 import type { Task } from '../types'
-import { Link } from 'react-router-dom'
+import type { ReactNode } from 'react'
 
 
 const priorityStyles: Record<TaskPriority, string> = {
@@ -26,19 +26,15 @@ function personLabel(id: string, name: string | null, me: string): string {
   return name ?? 'Unknown user'
 }
 
-type Props = { task: Task; currentUserId: string; canEdit: boolean }
+type Props = { task: Task; currentUserId: string; actions?: ReactNode }
 
-export function TaskCard({ task, currentUserId, canEdit }: Props) {
+export function TaskCard({ task, currentUserId, actions }: Props) {
   return (
     <article className="rounded-xl border border-slate-800 bg-slate-900 p-5">
       <div className="flex items-start justify-between gap-3">
         <h2 className="font-medium text-slate-100">{task.title}</h2>
         <TaskStatusBadge status={task.status} />
-        {canEdit && (
-          <Link to={`/tasks/${task.id}/edit`} className="ml-auto text-indigo-400 hover:underline">
-            Edit
-          </Link>
-        )}
+        {actions}
       </div>
 
       {task.description && (

@@ -1,6 +1,8 @@
 import type { PagedResult, TaskStatus } from "@/types/api";
-import type { CreateTaskBody, Task, TaskRelation, TaskUpdates, UpdateDeadlinesBody, UpdateDetailsBody } from "./types";
+import type { CreateTaskBody, Task, TaskRelation, UpdateDeadlinesBody, UpdateDetailsBody } from "./types";
 import { api } from "@/lib/api";
+
+type TaskAction = 'complete' | 'halt' | 'resume' | 'restore'
 
 export interface TaskFilters {
     status?: TaskStatus;
@@ -39,4 +41,26 @@ export async function setTaskRepetitive(taskId: string, isRepetitive: boolean): 
     return data;
 }
 
-export type { TaskUpdates }
+async function postAction(id:string, action: TaskAction): Promise<Task>{
+    const { data } = await api.post<Task>(`/tasks/${id}/${action}`);
+    return data;
+}
+
+export const completeTask = (id:string) => postAction(id,'complete')
+export const haltTask = (id:string) => postAction(id,'halt') 
+export const resumeTask = (id:string) => postAction(id,'resume')
+export const restoreTask = (id:string) => postAction(id,'restore')
+
+export async function deleteTask(id: string): Promise<void> {
+    await api.delete(`/tasks/${id}`);
+}
+
+export async function bulkDeleteTasks(status: TaskStatus): Promise<{deletedCount:number}> {
+    const { data } = await api.post<{deletedCount: number}>(`/tasks/bulk-delete`, { status });
+    return data;
+}
+
+export async function reassignTask(id: string, newAssigneeId: string): Promise<Task> {
+    const { data } = await api.put<Task>(`/tasks/${id}/assignee`, { newAssigneeId });
+    return data;
+}
