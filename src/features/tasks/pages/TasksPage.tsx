@@ -9,6 +9,7 @@ import { getErrorMessage } from "@/lib/apiError";
 import type { TaskRelation } from "../types";
 import { FilterTabs } from "@/components/FilterTabs";
 import { TaskActions } from "../components/TasksActions";
+import { BulkDeleteButton } from "../components/BulkDeleteButton";
 
 const PAGE_SIZE = 5
 
@@ -49,6 +50,7 @@ export function TasksPage(){
 
     const totalPages = data ? Math.max(1,Math.ceil(data.totalCount / PAGE_SIZE)) : 1
 
+    const canBulkDelete = !!status && !!data?.items.some((t) => t.status === status && t.createdByUserId==me.id)
    return (
     <div className="space-y-6">
       <div className="flex items-end justify-between">
@@ -83,7 +85,11 @@ export function TasksPage(){
         Clear filters
       </button>
       )}
+      <div>
+         {canBulkDelete && status &&<BulkDeleteButton status={status} />}
+      </div>
     </div>
+    
 
       {isPending ? (
         <TaskListSkeleton />

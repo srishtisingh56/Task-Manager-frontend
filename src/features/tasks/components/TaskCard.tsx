@@ -67,6 +67,6 @@ export function TaskCard({ task, currentUserId, actions }: Props) {
         )}
         {task.isRepetitive && <span className="text-slate-500">Repeats</span>}
       </div>
-    </article>
+    </article>                       
   )
 }

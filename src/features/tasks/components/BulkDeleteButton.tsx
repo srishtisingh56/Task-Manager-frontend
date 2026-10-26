@@ -10,7 +10,7 @@ export function BulkDeleteButton({ status }: { status: TaskStatus }) {
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="text-sm text-red-300 hover:underline">
+      <button type="button" onClick={() => setOpen(true)} className="text-sm text-red-300 hover:text-red-400">
         Delete all my {status} tasks
       </button>
 
