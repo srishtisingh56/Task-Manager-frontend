@@ -1,6 +1,7 @@
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '@/features/auth/authStore'
 import { getErrorMessage } from '@/lib/apiError'
+import { NotificationRulesSection } from '@/features/notifications/components/NotificationRulesSection'
 import { TaskForm } from './TaskForm'
 import { useTask } from '../hooks/useTasks'
 import { useUpdateTask, UpdateTaskError } from '../hooks/useUpdateTask'
@@ -11,6 +12,8 @@ import { buildTaskUpdates, taskToFormValues } from '../form/taskFormMapping'
 export function EditTaskPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const focusReminders = searchParams.get('section') === 'reminders'
   const me = useAuthStore((s) => s.user!)
   const { data: task, isPending, isError, error } = useTask(id)
   const update = useUpdateTask()
@@ -60,6 +63,7 @@ export function EditTaskPage() {
           )
         }
       />
+      <NotificationRulesSection taskId={task.id} autoOpenCreate={focusReminders} />
     </div>
   )
 }

@@ -61,13 +61,20 @@ export function TaskActions({ task, me }: Props) {
         {can.reassign && (
           <button onClick={() => setReassignOpen(true)} className={btn}>Reassign</button>
         )}
-        {can.delete && (
-          <button
-            onClick={() => setConfirmDelete(true)}
-            className="ml-auto rounded-lg px-3 py-1.5 text-sm text-red-300 hover:bg-red-500/10"
-          >
-            Delete
-          </button>
+        {(can.edit || can.delete) && (
+          <div className="ml-auto flex items-center gap-2">
+            {can.edit && (
+              <Link to={`/tasks/${task.id}/edit?section=reminders`} className={btn}>Add reminder</Link>
+            )}
+            {can.delete && (
+              <button
+                onClick={() => setConfirmDelete(true)}
+                className="rounded-lg px-3 py-1.5 text-sm text-red-300 hover:bg-red-500/10"
+              >
+                Delete
+              </button>
+            )}
+          </div>
         )}
       </div>
 

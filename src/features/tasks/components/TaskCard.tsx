@@ -34,7 +34,6 @@ export function TaskCard({ task, currentUserId, actions }: Props) {
       <div className="flex items-start justify-between gap-3">
         <h2 className="font-medium text-slate-100">{task.title}</h2>
         <TaskStatusBadge status={task.status} />
-        {actions}
       </div>
 
       {task.description && (
@@ -67,6 +66,8 @@ export function TaskCard({ task, currentUserId, actions }: Props) {
         )}
         {task.isRepetitive && <span className="text-slate-500">Repeats</span>}
       </div>
-    </article>                       
+
+      {actions}
+    </article>
   )
 }
