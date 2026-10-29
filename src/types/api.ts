@@ -1,7 +1,7 @@
 export type TaskStatus = 'Pending' | 'Completed' | 'Halted' | 'Overdue';
 export type TaskPriority = 'Low' | 'Medium' | 'High' | 'Critical';
 export type NotificationOffsetUnit = 'Minutes' | 'Hours' | 'Days' | 'Weeks';
-export type NotificationRepeatMode = 'Once' | 'Repeating';
+export type NotificationRepeatMode = 'Once' | 'Repeat';
 
 export interface PagedResult<T>{
     items: T[];

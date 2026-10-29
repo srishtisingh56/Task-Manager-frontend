@@ -11,18 +11,18 @@ export const TRIGGER_EVENT_OPTIONS: { label: string; value: RuleTriggerEvent }[]
 ]
 
 export const OFFSET_UNIT_OPTIONS: NotificationOffsetUnit[] = ['Minutes', 'Hours', 'Days', 'Weeks']
-export const REPEAT_MODE_OPTIONS: NotificationRepeatMode[] = ['Once', 'Repeating']
+export const REPEAT_MODE_OPTIONS: NotificationRepeatMode[] = ['Once', 'Repeat']
 
 export const ruleFormSchema = z
   .object({
     triggerEvent: z.enum(['AfterCreationOffset', 'BeforeLenientDeadline', 'BeforeStrictDeadline']),
     offsetValue: z.number().int().positive('Must be a positive number'),
     offsetUnit: z.enum(['Minutes', 'Hours', 'Days', 'Weeks']),
-    repeatMode: z.enum(['Once', 'Repeating']),
+    repeatMode: z.enum(['Once', 'Repeat']),
   })
   // Only AfterCreationOffset may repeat; deadline-warning triggers are always Once (domain_layer.md §3).
   .superRefine((v, ctx) => {
-    if (v.repeatMode === 'Repeating' && v.triggerEvent !== 'AfterCreationOffset') {
+    if (v.repeatMode === 'Repeat' && v.triggerEvent !== 'AfterCreationOffset') {
       ctx.addIssue({
         code: 'custom',
         path: ['repeatMode'],

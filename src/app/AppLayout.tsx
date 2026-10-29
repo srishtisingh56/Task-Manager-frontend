@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useAuthStore } from '@/features/auth/authStore'
 import { Toaster } from '@/components/Toaster'
 
@@ -10,7 +11,14 @@ export function AppLayout() {
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <header className="border-b border-slate-800">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
-          <span className="font-semibold">TaskManager</span>
+          <div className="flex items-center gap-5">
+            <Link to="/" className="font-semibold">TaskManager</Link>
+            {user?.isSystemAdmin && (
+              <Link to="/admin/users" className="text-sm text-slate-400 hover:text-slate-200">
+                Users
+              </Link>
+            )}
+          </div>
           <div className="flex items-center gap-3 text-sm">
             <span className="text-slate-400">{user?.name}</span>
             <button
