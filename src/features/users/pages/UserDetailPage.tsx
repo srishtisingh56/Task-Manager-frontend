@@ -4,6 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { useAuthStore } from '@/features/auth/authStore'
 import { Field, inputClass } from '@/components/Field'
+import { ErrorState, ListSkeleton } from '@/components/States'
+import { Badge } from '@/components/Badge'
 import { getErrorMessage, getFieldErrors } from '@/lib/apiError'
 import { useUser } from '../hooks/useUsers'
 import { useUpdateContactDetails } from '../hooks/useUserActions'
@@ -14,7 +16,7 @@ export function UserDetailPage() {
   const { id } = useParams<{ id: string }>()
   const me = useAuthStore((s) => s.user!)
   const [editing, setEditing] = useState(false)
-  const { data: user, isPending, isError, error } = useUser(id)
+  const { data: user, isPending, isError, error, refetch } = useUser(id)
   const update = useUpdateContactDetails()
 
   const {
@@ -38,9 +40,9 @@ export function UserDetailPage() {
     }
   }, [update.error, setError])
 
-  if (!id) return <Navigate to="/admin/users" replace />
-  if (isPending) return <p className="text-slate-400">Loading user…</p>
-  if (isError) return <p role="alert" className="text-red-300">{getErrorMessage(error)}</p>
+  if (!id) return <Navigate to="/" replace />
+  if (isPending) return <ListSkeleton count={1} label="Loading user" />
+  if (isError) return <ErrorState error={error} onRetry={() => refetch()} />
 
   const canEdit = canEditUser(me, user)
 
@@ -58,20 +60,14 @@ export function UserDetailPage() {
 
   return (
     <div className="space-y-6">
-      <Link to="/admin/users" className="text-normal text-slate-400 hover:text-slate-200">
-        ← Back to users
+      <Link to={me.isSystemAdmin ? '/admin/users' : '/'} className="text-normal text-slate-400 hover:text-slate-200">
+        ← {me.isSystemAdmin ? 'Back to users' : 'Back to tasks'}
       </Link>
 
       <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 m-4">
         <div className="flex items-start justify-between gap-3">
           <h1 className="text-2xl font-semibold text-slate-100">{user.name}</h1>
-          <span
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-              user.isActive ? 'bg-emerald-500/15 text-emerald-300' : 'bg-slate-500/15 text-slate-300'
-            }`}
-          >
-            {user.isActive ? 'Active' : 'Inactive'}
-          </span>
+          <Badge tone={user.isActive ? 'green' : 'slate'}>{user.isActive ? 'Active' : 'Inactive'}</Badge>
         </div>
 
         <dl className="mt-4 space-y-2 text-sm">

@@ -5,7 +5,7 @@ import type { TaskStatus } from "@/types/api";
 import { useTasks } from "../hooks/useTasks";
 import { Pagination } from "@/components/Pagination";
 import { TaskCard } from "../components/TaskCard";
-import { getErrorMessage } from "@/lib/apiError";
+import { EmptyState, ErrorState, ListSkeleton } from "@/components/States";
 import type { TaskRelation } from "../types";
 import { FilterTabs } from "@/components/FilterTabs";
 import { TaskActions } from "../components/TasksActions";
@@ -92,26 +92,14 @@ export function TasksPage(){
     
 
       {isPending ? (
-        <TaskListSkeleton />
+        <ListSkeleton label="Loading tasks" />
       ) : isError ? (
-        <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-5">
-          <p className="text-red-300">{getErrorMessage(error)}</p>
-          <button
-            onClick={() => refetch()}
-            className="mt-3 rounded-lg border border-red-400/40 px-3 py-1.5 text-sm text-red-200 hover:bg-red-500/10"
-          >
-            Try again
-          </button>
-        </div>
+        <ErrorState error={error} onRetry={() => refetch()} />
       ) : data.items.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-slate-700 p-10 text-center">
-          <p className="text-slate-300">No tasks here yet.</p>
-          <p className="mt-1 text-sm text-slate-500">
-            {status || relation
-              ? 'No tasks match these filters.'
-              : 'Tasks you create or are assigned will appear here.'}
-          </p>
-        </div>
+        <EmptyState
+          title="No tasks here yet."
+          hint={status || relation ? 'No tasks match these filters.' : 'Tasks you create or are assigned will appear here.'}
+        />
       ) : (
         <>
           <div className={`space-y-3 transition-opacity ${isPlaceholderData ? 'opacity-60' : ''}`}>
@@ -131,16 +119,6 @@ export function TasksPage(){
           />
         </>
       )}
-    </div>
-  )
-}
-
-function TaskListSkeleton() {
-  return (
-    <div className="space-y-3" aria-busy="true" aria-label="Loading tasks">
-      {Array.from({ length: 3 }, (_, i) => (
-        <div key={i} className="h-32 animate-pulse rounded-xl bg-slate-900" />
-      ))}
     </div>
   )
 }

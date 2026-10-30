@@ -1,9 +1,13 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '@/features/auth/authStore'
 import { Pagination } from '@/components/Pagination'
 import { FilterTabs } from '@/components/FilterTabs'
-import { getErrorMessage } from '@/lib/apiError'
+import { Badge } from '@/components/Badge'
+import { Button } from '@/components/Button'
+import { buttonClass } from '@/components/buttonClass'
+import { ConfirmDialog } from '@/components/ConfirmDialog'
+import { EmptyState, ErrorState, ListSkeleton } from '@/components/States'
 import type { User } from '@/features/auth/types'
 import { useAllUsers } from '../hooks/useUsers'
 import { STATUS_OPTIONS } from '../filterOptions'
@@ -17,16 +21,27 @@ const PAGE_SIZE = 10
 export function UsersPage() {
   const me = useAuthStore((s) => s.user!)
   const navigate = useNavigate()
-  const [page, setPage] = useState(1)
-  const [status, setStatus] = useState<'active' | 'inactive' | undefined>(undefined)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const status = STATUS_OPTIONS.find((opt) => opt.value === searchParams.get('status'))?.value
+  const page = Math.max(1, Number(searchParams.get('page')) || 1)
   const [managing, setManaging] = useState<User | null>(null)
+  const [confirming, setConfirming] = useState<{ action: 'deactivate' | 'demote'; user: User } | null>(null)
 
-  const changeStatus = (value: 'active' | 'inactive' | undefined) => {
-    setStatus(value)
-    setPage(1)
+  function updateParams(changes: Record<string, string | undefined>) {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev)
+      for (const [key, val] of Object.entries(changes)) {
+        if (val === undefined) params.delete(key)
+        else params.set(key, val)
+      }
+      return params
+    })
   }
 
-  const { data, isPending, isError, error, isPlaceholderData } = useAllUsers({
+  const changeStatus = (value: 'active' | 'inactive' | undefined) => updateParams({ status: value, page: undefined })
+  const setPage = (p: number) => updateParams({ page: String(p) })
+
+  const { data, isPending, isError, error, refetch, isPlaceholderData } = useAllUsers({
     pageNumber: page,
     pageSize: PAGE_SIZE,
     isActive: status === 'active' ? true : status === 'inactive' ? false : undefined,
@@ -45,10 +60,7 @@ export function UsersPage() {
           <h1 className="text-2xl font-semibold text-slate-100">Users</h1>
           {data && <p className="text-sm text-slate-400">{data.totalCount} users</p>}
         </div>
-        <Link
-          to="/admin/users/new"
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
-        >
+        <Link to="/admin/users/new" className={buttonClass('primary')}>
           New user
         </Link>
       </div>
@@ -56,9 +68,11 @@ export function UsersPage() {
       <FilterTabs label="Filter by status" options={STATUS_OPTIONS} value={status} onChange={changeStatus} />
 
       {isPending ? (
-        <p className="text-slate-400">Loading users…</p>
+        <ListSkeleton label="Loading users" />
       ) : isError ? (
-        <p role="alert" className="text-red-300">{getErrorMessage(error)}</p>
+        <ErrorState error={error} onRetry={() => refetch()} />
+      ) : data.items.length === 0 ? (
+        <EmptyState title="No users found." hint={status ? 'No users match this filter.' : undefined} />
       ) : (
         <>
           <div className={`space-y-3 transition-opacity ${isPlaceholderData ? 'opacity-60' : ''}`}>
@@ -82,19 +96,9 @@ export function UsersPage() {
                     </h2>
                     <p className="text-sm text-slate-400">{user.email} · {user.phoneNumber}</p>
                   </div>
-                  <div className="flex gap-2 text-xs">
-                    <span
-                      className={`rounded-full px-2.5 py-0.5 font-medium ${
-                        user.isActive ? 'bg-emerald-500/15 text-emerald-300' : 'bg-slate-500/15 text-slate-300'
-                      }`}
-                    >
-                      {user.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                    {user.isSystemAdmin && (
-                      <span className="rounded-full bg-indigo-500/15 px-2.5 py-0.5 font-medium text-indigo-300">
-                        Admin
-                      </span>
-                    )}
+                  <div className="flex gap-2">
+                    <Badge tone={user.isActive ? 'green' : 'slate'}>{user.isActive ? 'Active' : 'Inactive'}</Badge>
+                    {user.isSystemAdmin && <Badge tone="indigo">Admin</Badge>}
                   </div>
                 </div>
 
@@ -106,50 +110,41 @@ export function UsersPage() {
                   onClick={(e) => e.stopPropagation()}
                   className="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-800 pt-4"
                 >
-                  <button
-                    type="button"
-                    onClick={() => setManaging(user)}
-                    className="rounded-lg border border-slate-700 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-800"
-                  >
+                  <Button size="sm" onClick={() => setManaging(user)}>
                     Manage manager
-                  </button>
+                  </Button>
 
                   {user.id !== me.id && (
                     <>
                       {user.isSystemAdmin ? (
-                        <button
-                          disabled={demote.isPending}
-                          onClick={() => demote.mutate(user.id)}
-                          className="rounded-lg border border-slate-700 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-50"
-                        >
+                        <Button size="sm" onClick={() => setConfirming({ action: 'demote', user })}>
                           Demote from admin
-                        </button>
+                        </Button>
                       ) : (
-                        <button
-                          disabled={promote.isPending}
-                          onClick={() => promote.mutate(user.id)}
-                          className="rounded-lg border border-slate-700 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-50"
-                        >
+                        <Button size="sm" disabled={promote.isPending} onClick={() => promote.mutate(user.id)}>
                           Promote to admin
-                        </button>
+                        </Button>
                       )}
 
                       {user.isActive ? (
-                        <button
-                          disabled={deactivate.isPending}
-                          onClick={() => deactivate.mutate(user.id)}
-                          className="ml-auto rounded-lg px-3 py-1.5 text-sm text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          className="ml-auto"
+                          onClick={() => setConfirming({ action: 'deactivate', user })}
                         >
                           Deactivate
-                        </button>
+                        </Button>
                       ) : (
-                        <button
+                        <Button
+                          size="sm"
+                          variant="success"
+                          className="ml-auto"
                           disabled={reactivate.isPending}
                           onClick={() => reactivate.mutate(user.id)}
-                          className="ml-auto rounded-lg px-3 py-1.5 text-sm text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50"
                         >
                           Reactivate
-                        </button>
+                        </Button>
                       )}
                     </>
                   )}
@@ -163,6 +158,26 @@ export function UsersPage() {
       )}
 
       {managing && <AssignManagerDialog user={managing} onClose={() => setManaging(null)} />}
+
+      {confirming && (
+        <ConfirmDialog
+          title={confirming.action === 'deactivate' ? `Deactivate ${confirming.user.name}?` : `Demote ${confirming.user.name}?`}
+          confirmLabel={confirming.action === 'deactivate' ? 'Deactivate' : 'Demote'}
+          destructive
+          isPending={confirming.action === 'deactivate' ? deactivate.isPending : demote.isPending}
+          onCancel={() => setConfirming(null)}
+          onConfirm={() => {
+            const mutation = confirming.action === 'deactivate' ? deactivate : demote
+            mutation.mutate(confirming.user.id, { onSuccess: () => setConfirming(null) })
+          }}
+        >
+          <p>
+            {confirming.action === 'deactivate'
+              ? 'Their account will be marked inactive and they will stop receiving notifications. You can reactivate them later.'
+              : 'They will lose system admin rights immediately. You can promote them again later.'}
+          </p>
+        </ConfirmDialog>
+      )}
     </div>
   )
 }

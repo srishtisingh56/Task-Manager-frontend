@@ -11,6 +11,8 @@ export interface NotificationLog {
   channel: NotificationChannel
   deliveryStatus: NotificationDeliveryStatus
   sentAt: string
+  recipientName: string | null // admin-only; null for non-admins
+  taskCreatorName: string | null // admin-only; null for non-admins
 }
 
 export const TRIGGER_EVENT_LABELS: Record<NotificationTriggerEvent, string> = {

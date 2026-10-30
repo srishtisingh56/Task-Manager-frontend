@@ -21,7 +21,9 @@ function describeRule(rule: NotificationRule): string {
   return `${label} · ${offset} · ${rule.repeatMode}`
 }
 
-export function NotificationRulesSection({ taskId, autoOpenCreate }: { taskId: string; autoOpenCreate?: boolean }) {
+type Props = { taskId: string; autoOpenCreate?: boolean; readOnly?: boolean }
+
+export function NotificationRulesSection({ taskId, autoOpenCreate, readOnly }: Props) {
     
   const sectionRef = useRef<HTMLElement>(null)
   const [page, setPage] = useState(1)
@@ -49,13 +51,15 @@ export function NotificationRulesSection({ taskId, autoOpenCreate }: { taskId: s
     <section id="reminders" className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-6">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-slate-100">Reminders</h2>
-        <button
-          type="button"
-          onClick={() => setCreating(true)}
-          className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-500"
-        >
-          Add reminder
-        </button>
+        {!readOnly && (
+          <button
+            type="button"
+            onClick={() => setCreating(true)}
+            className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-500"
+          >
+            Add reminder
+          </button>
+        )}
       </div>
 
       {isPending ? (
@@ -72,14 +76,16 @@ export function NotificationRulesSection({ taskId, autoOpenCreate }: { taskId: s
               className="flex items-center justify-between rounded-lg border border-slate-800 px-3 py-2 text-sm text-slate-300"
             >
               <span>{describeRule(rule)}</span>
-              <div className="flex gap-3">
-                <button type="button" onClick={() => setEditing(rule)} className="text-indigo-400 hover:text-indigo-300">
-                  Edit
-                </button>
-                <button type="button" onClick={() => setDeleting(rule)} className="text-red-400 hover:text-red-300">
-                  Delete
-                </button>
-              </div>
+              {!readOnly && (
+                <div className="flex gap-3">
+                  <button type="button" onClick={() => setEditing(rule)} className="text-indigo-400 hover:text-indigo-300">
+                    Edit
+                  </button>
+                  <button type="button" onClick={() => setDeleting(rule)} className="text-red-400 hover:text-red-300">
+                    Delete
+                  </button>
+                </div>
+              )}
             </li>
           ))}
         </ul>

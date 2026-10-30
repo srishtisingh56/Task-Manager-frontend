@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Modal } from './Model'
+import { Button } from './Button'
 
 type Props = {
   title: string
@@ -26,24 +27,12 @@ export function ConfirmDialog({
       )}
 
       <div className="mt-5 flex justify-end gap-3">
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={isPending}
-          className="rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 disabled:opacity-50"
-        >
+        <Button variant="ghost" onClick={onCancel} disabled={isPending}>
           Cancel
-        </button>
-        <button
-          type="button"
-          onClick={onConfirm}
-          disabled={isPending}
-          className={`rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-60 ${
-            destructive ? 'bg-red-600 hover:bg-red-500' : 'bg-indigo-600 hover:bg-indigo-500'
-          }`}
-        >
+        </Button>
+        <Button variant={destructive ? 'destructive' : 'primary'} onClick={onConfirm} disabled={isPending}>
           {isPending ? 'Working…' : confirmLabel}
-        </button>
+        </Button>
       </div>
     </Modal>
   )

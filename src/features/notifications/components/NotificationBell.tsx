@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '@/features/auth/authStore'
-import { formatDateTime } from '@/lib/dates'
+import { formatDateTime, formatRelative } from '@/lib/dates'
 import { BELL_PAGE_SIZE, useBellNotifications } from '../hooks/useNotificationLogs'
 import { isNewerThan, useNotificationSeenStore } from '../notificationSeenStore'
 import { TRIGGER_EVENT_LABELS } from '../types'
@@ -88,7 +88,9 @@ export function NotificationBell() {
                   >
                     <p className="text-sm text-slate-100">{TRIGGER_EVENT_LABELS[log.triggerEvent]}</p>
                     <p className="truncate text-sm text-slate-400">{log.taskTitle}</p>
-                    <p className="mt-0.5 text-xs text-slate-500">{formatDateTime(log.sentAt)}</p>
+                    <time dateTime={log.sentAt} title={formatDateTime(log.sentAt)} className="mt-0.5 block text-xs text-slate-500">
+                      {formatRelative(log.sentAt)}
+                    </time>
                   </Link>
                 </li>
               ))}

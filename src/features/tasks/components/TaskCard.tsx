@@ -3,6 +3,7 @@ import { formatDateTime } from '@/lib/dates'
 import { TaskStatusBadge } from './TaskStatusBadge'
 import type { Task } from '../types'
 import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 
 
 const priorityStyles: Record<TaskPriority, string> = {
@@ -32,7 +33,9 @@ export function TaskCard({ task, currentUserId, actions }: Props) {
   return (
     <article className="rounded-xl border border-slate-800 bg-slate-900 p-5">
       <div className="flex items-start justify-between gap-3">
-        <h2 className="font-medium text-slate-100">{task.title}</h2>
+        <h2 className="font-medium text-slate-100">
+          <Link to={`/tasks/${task.id}`} className="hover:underline">{task.title}</Link>
+        </h2>
         <TaskStatusBadge status={task.status} />
       </div>
 
