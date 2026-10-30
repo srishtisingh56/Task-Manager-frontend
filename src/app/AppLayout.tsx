@@ -2,6 +2,8 @@ import { Outlet } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '@/features/auth/authStore'
 import { Toaster } from '@/components/Toaster'
+import { NotificationBell } from '@/features/notifications/components/NotificationBell'
+import { NotificationToastWatcher } from '@/features/notifications/components/NotificationToastWatcher'
 
 export function AppLayout() {
   const user = useAuthStore((s) => s.user)
@@ -20,6 +22,7 @@ export function AppLayout() {
             )}
           </div>
           <div className="flex items-center gap-3 text-sm">
+            <NotificationBell />
             <span className="text-slate-400">{user?.name}</span>
             <button
               onClick={logout}
@@ -35,6 +38,7 @@ export function AppLayout() {
         <Outlet />
       </main>
       <Toaster />
+      <NotificationToastWatcher />
     </div>
   )
 }

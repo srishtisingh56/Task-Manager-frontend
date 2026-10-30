@@ -1,6 +1,20 @@
 import { api } from '@/lib/api'
-import type { PagedResult } from '@/types/api'
-import type { CreateNotificationRuleBody, NotificationRule, UpdateScheduleBody } from './types'
+import type { NotificationChannel, PagedResult } from '@/types/api'
+import type { CreateNotificationRuleBody, NotificationLog, NotificationRule, UpdateScheduleBody } from './types'
+
+export interface NotificationLogFilters {
+  taskId?: string
+  channel?: NotificationChannel
+  onlyMine?: boolean
+  pageNumber: number
+  pageSize: number
+}
+
+// Admin sees all; others see logs for tasks they created or logs addressed to them.
+export async function fetchNotificationLogs(filters: NotificationLogFilters): Promise<PagedResult<NotificationLog>> {
+  const { data } = await api.get<PagedResult<NotificationLog>>('/notification-logs', { params: filters })
+  return data
+}
 
 export interface NotificationRuleFilters {
   pageNumber: number

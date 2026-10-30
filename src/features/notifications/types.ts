@@ -1,4 +1,28 @@
-import type { NotificationOffsetUnit, NotificationRepeatMode } from '@/types/api'
+import type {
+  NotificationChannel, NotificationDeliveryStatus, NotificationOffsetUnit, NotificationRepeatMode,
+  NotificationTriggerEvent,
+} from '@/types/api'
+
+export interface NotificationLog {
+  id: string
+  taskId: string
+  taskTitle: string
+  triggerEvent: NotificationTriggerEvent
+  channel: NotificationChannel
+  deliveryStatus: NotificationDeliveryStatus
+  sentAt: string
+}
+
+export const TRIGGER_EVENT_LABELS: Record<NotificationTriggerEvent, string> = {
+  Created: 'Task created',
+  Updated: 'Task updated',
+  Deleted: 'Task deleted',
+  Completed: 'Task completed',
+  AfterCreationOffset: 'Follow-up reminder',
+  BeforeLenientDeadline: 'Lenient deadline approaching',
+  BeforeStrictDeadline: 'Strict deadline approaching',
+  StrictDeadlinePassed: 'Strict deadline passed',
+}
 
 // Only these 3 trigger events can have a NotificationRule; the rest are immediate/system events.
 export type RuleTriggerEvent = 'AfterCreationOffset' | 'BeforeLenientDeadline' | 'BeforeStrictDeadline'

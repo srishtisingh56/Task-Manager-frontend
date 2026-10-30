@@ -46,7 +46,7 @@ export function UserDetailPage() {
 
   const onSubmit = (values: ContactDetailsFormValues) => {
     const body: { name?: string; email?: string; phoneNumber?: string } = {}
-    if (dirtyFields.name) body.name = values.name.trim()
+    if (dirtyFields.name) body.name = values.   name.trim()
     if (dirtyFields.email) body.email = values.email.trim()
     if (dirtyFields.phoneNumber) body.phoneNumber = values.phoneNumber.trim()
     if (Object.keys(body).length === 0) {
